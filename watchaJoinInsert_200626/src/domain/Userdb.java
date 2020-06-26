@@ -20,7 +20,6 @@ public class Userdb {
 		// TODO Auto-generated constructor stub
 	}
 	
-	
 	public String getUsercode() {
 		return usercode;
 	}
@@ -150,7 +149,6 @@ public class Userdb {
 	public void setUserwithdrawal(boolean userwithdrawal) {
 		this.userwithdrawal = userwithdrawal;
 	}
-
 
 	public Userdb(String usercode, String userid, String userpw, String usernickname, String userprofileimage,
 			String watchaplaymembership, Date userlastlogindate, String islogin, String isremove, int isemail,

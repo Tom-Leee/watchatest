@@ -76,4 +76,30 @@ public class UserdbDao extends AbstractDao {
 			close();
 			return result;
 		}
+		//삽입하는 메소드 생성
+			public int joininsert(Userdb userdb) {
+					int result = -1;
+					connect();
+				try {
+					//SQL 생성
+					pstmt = con.prepareStatement("insert into userdb(usercode, userid, userpw, usernickname, userprofileimage)"
+							+ " values(?, ?, ?, ? ,?);");
+					//데이터 바인딩
+					pstmt.setString(1, userdb.getUsercode());
+					pstmt.setString(2, userdb.getUserid().toUpperCase());
+					pstmt.setString(3, userdb.getUserpw());
+					pstmt.setString(4, userdb.getUsernickname());
+					pstmt.setString(5, userdb.getUserprofileimage());
+					//SQL 실행
+					result = pstmt.executeUpdate();
+					
+				}catch(Exception e) {
+					System.out.println("DAO:" + e.getMessage());
+					e.printStackTrace();
+				}
+					
+				close();
+				return result;
+			}
+				
 }
