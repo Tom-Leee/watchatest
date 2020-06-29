@@ -1,0 +1,134 @@
+package dao;
+
+import domain.Userdb;
+
+public class UserdbDao extends AbstractDao {
+	//Singleton 패턴을 적용하기 위한 코드
+	//인스턴스를 하나만 생성하는 디자인 패턴
+	//모든 곳에서 공유할 데이터를 갖는 클래스나
+	//Entry Point(출입구)에 해당하는 클래스 또는
+	//서버에서 클라이언트의 요청을 처리하는 클래스는
+	//인스턴스가 1개이면 된다.
+	private UserdbDao() {}
+	
+	private static UserdbDao userdbDao;
+
+	public static UserdbDao sharedInstance() {
+		if (userdbDao == null) {
+			userdbDao = new UserdbDao();
+		}
+		return userdbDao;
+	}
+	//userid(email) 중복 검사를 위한 메소드
+	public boolean useridCheck(String userid) {
+		System.out.println(userid);
+		boolean result = false;
+		connect();
+		
+		try {
+			//SQL 생성
+			//userid(email)을 대문자로 변경해서 비교
+			pstmt = con.prepareStatement("select userid from userdb where upper(userid) = ?");
+			//데이터 바인딩
+			pstmt.setString(1, userid.toUpperCase());
+			//SQL 실행
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				result = false;
+			}else{
+				result = true;
+			}
+
+		}catch(Exception e) {
+			System.out.println("DAO:" + e.getMessage());
+			e.printStackTrace();
+		}
+		
+		System.out.println(result);
+		close();
+		return result;
+	}
+	
+	//usernickname 중복 검사를 위한 메소드
+		public boolean usernicknameCheck(String usernickname) {
+			System.out.println(usernickname);
+			boolean result = false;
+			connect();
+			
+			try {
+				//SQL 생성
+				pstmt = con.prepareStatement("select usernickname from userdb where upper(usernickname) = ?");
+				//데이터 바인딩
+				pstmt.setString(1, usernickname.toUpperCase());
+				//SQL 실행
+				rs = pstmt.executeQuery();
+				if(rs.next()) {
+					result = false;
+				}else{
+					result = true;
+				}
+	
+			}catch(Exception e) {
+				System.out.println("DAO:" + e.getMessage());
+				e.printStackTrace();
+			}
+			
+			close();
+			return result;
+		}
+		//삽입하는 메소드 생성
+			public int joininsert(Userdb userdb) {
+					int result = -1;
+					connect();
+				try {
+					//SQL 생성
+					pstmt = con.prepareStatement("insert into userdb(usercode, userid, userpw, usernickname, userprofileimage)"
+							+ " values(?, ?, ?, ? ,?);");
+					//데이터 바인딩
+					pstmt.setString(1, userdb.getUsercode());
+					pstmt.setString(2, userdb.getUserid().toUpperCase());
+					pstmt.setString(3, userdb.getUserpw());
+					pstmt.setString(4, userdb.getUsernickname());
+					pstmt.setString(5, userdb.getUserprofileimage());
+					//SQL 실행
+					result = pstmt.executeUpdate();
+					
+				}catch(Exception e) {
+					System.out.println("DAO:" + e.getMessage());
+					e.printStackTrace();
+				}
+					
+				close();
+				return result;
+			}
+		//로그인처리를 위한 메소드
+			public Userdb logincheck(String userid) {
+				//System.out.println("DAO의 userid:" + userid);
+				//없는 아이디인 경우는 null을 리턴
+				Userdb userdb = null;
+				connect();
+				try {
+					//SQL 맨달기
+					//userdb 테이블에서 id를 가지고 데이터를 찾아오기
+					pstmt = con.prepareStatement(" select * from userdb where userid=? ");
+					pstmt.setString(1, userid);
+					//SQL 실행
+					rs = pstmt.executeQuery();
+					//데이터 읽어서 저장
+					if(rs.next()) {
+						userdb = new Userdb();
+						userdb.setUserid(rs.getString("userid"));
+						userdb.setUserpw(rs.getString("userpw"));
+						userdb.setUsernickname(rs.getString("usernickname"));
+						userdb.setUserprofileimage(rs.getString("userprofileimage"));
+					}
+				}catch(Exception e) {
+					System.out.println("DAO:" + e.getMessage());
+					e.printStackTrace();
+				}
+				close();
+				//System.out.println("DAO 리턴" + userdb);
+				return userdb;
+			}
+				
+}
